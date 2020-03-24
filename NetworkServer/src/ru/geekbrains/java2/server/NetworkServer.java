@@ -22,6 +22,8 @@ public class NetworkServer {
     private final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
     private final AuthService authService;
 
+    private static final int CONNECTION_TIMEOUT = 120000;
+
     public NetworkServer(int port) {
         this.port = port;
         this.authService = new BaseAuthService();
@@ -34,6 +36,7 @@ public class NetworkServer {
             while (true) {
                 System.out.println("Ожидание клиентского подключения...");
                 Socket clientSocket = serverSocket.accept();
+                clientSocket.setSoTimeout(CONNECTION_TIMEOUT);
                 System.out.println("Клиент подлючился");
                 createClientHandler(clientSocket);
 
