@@ -20,6 +20,9 @@ public class ClientHandler {
 
     private String nickname;
 
+    private boolean successfulAuth;
+
+
     public ClientHandler(NetworkServer networkServer, Socket socket) {
         this.networkServer = networkServer;
         this.clientSocket = socket;
@@ -40,6 +43,15 @@ public class ClientHandler {
                     readMessages();
                 } catch (IOException e) {
                     System.out.println("Соединение с клиентом " + nickname + " было закрыто!");
+                    if (nickname != null) {
+                        String message = nickname + " покинул в чат!";
+                        try {
+                            networkServer.broadcastMessage(Command.messageCommand(null, message), this);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+
                 } finally {
                     closeConnection();
                 }
@@ -50,9 +62,9 @@ public class ClientHandler {
         }
     }
 
-    private void closeConnection() {
+    public void closeConnection() {
         try {
-            networkServer.unsubscribe(this);
+            if (successfulAuth) networkServer.unsubscribe(this);
             clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -107,7 +119,7 @@ public class ClientHandler {
                 continue;
             }
             if (command.getType() == CommandType.AUTH) {
-                boolean successfulAuth = processAuthCommand(command);
+                successfulAuth = processAuthCommand(command);
                 if (successfulAuth){
                     return;
                 }
@@ -150,4 +162,5 @@ public class ClientHandler {
     public String getNickname() {
         return nickname;
     }
+
 }

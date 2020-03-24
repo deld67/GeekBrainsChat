@@ -36,8 +36,9 @@ public class NetworkServer {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Клиент подлючился");
                 createClientHandler(clientSocket);
+
             }
-        } catch (IOException e) {
+        }catch (IOException e) {
             System.out.println("Ошибка при работе сервера");
             e.printStackTrace();
         } finally {
@@ -45,7 +46,7 @@ public class NetworkServer {
         }
     }
 
-    private void createClientHandler(Socket clientSocket) {
+    private void  createClientHandler(Socket clientSocket) {
         ClientHandler clientHandler = new ClientHandler(this, clientSocket);
         clientHandler.run();
     }
