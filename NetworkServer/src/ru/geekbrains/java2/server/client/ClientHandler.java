@@ -142,6 +142,7 @@ public class ClientHandler {
         else if (networkServer.isNicknameBusy(username)) {
             Command authErrorCommand = Command.authErrorCommand("Данный пользователь уже авторизован!");
             sendMessage(authErrorCommand);
+            clientSocket.setSoTimeout(0);
             return false;
         }
         else {
