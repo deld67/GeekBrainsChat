@@ -5,6 +5,7 @@ import ru.geekbrains.java2.client.CommandType;
 import ru.geekbrains.java2.client.command.AuthCommand;
 import ru.geekbrains.java2.client.command.BroadcastMessageCommand;
 import ru.geekbrains.java2.client.command.PrivateMessageCommand;
+import ru.geekbrains.java2.client.view.ChangeUsername;
 import ru.geekbrains.java2.server.NetworkServer;
 
 import java.io.*;
@@ -93,6 +94,9 @@ public class ClientHandler {
                     String message = commandData.getMessage();
                     networkServer.broadcastMessage(Command.messageCommand(nickname, message), this);
                     break;
+                }
+                case CHANGE_USERNAME:{
+                    ChangeUsername changeUsername = (ChangeUsername) command.getData();
                 }
                 default:
                     System.err.println("Unknown type of command : " + command.getType());

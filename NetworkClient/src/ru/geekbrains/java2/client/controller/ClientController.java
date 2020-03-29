@@ -2,6 +2,7 @@ package ru.geekbrains.java2.client.controller;
 
 import ru.geekbrains.java2.client.Command;
 import ru.geekbrains.java2.client.view.AuthDialog;
+import ru.geekbrains.java2.client.view.ChangeUsername;
 import ru.geekbrains.java2.client.view.ClientChat;
 import ru.geekbrains.java2.client.model.NetworkService;
 
@@ -16,12 +17,14 @@ public class ClientController {
     private final NetworkService networkService;
     private final AuthDialog authDialog;
     private final ClientChat clientChat;
+    private final ChangeUsername changeUsername;
     private String nickname;
 
     public ClientController(String serverHost, int serverPort) {
         this.networkService = new NetworkService(serverHost, serverPort);
         this.authDialog = new AuthDialog(this);
         this.clientChat = new ClientChat(this);
+        this.changeUsername = new ChangeUsername(this);
     }
 
     public void runApplication() throws IOException {
@@ -35,6 +38,7 @@ public class ClientController {
             public void authIsSuccessful(String nickname) {
                 ClientController.this.setUserName(nickname);
                 clientChat.setTitle(nickname);
+                clientChat.setLogin_user_name(nickname);
                 ClientController.this.openChat();
             }
         });
@@ -109,5 +113,20 @@ public class ClientController {
         users.remove(nickname);
         users.add(0, "All");
         clientChat.updateUsers(users);
+    }
+
+    public void openChangeUsernameDialog() {
+        changeUsername.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        changeUsername.setLocation(400,300);
+        changeUsername.setSize(300, 150);
+        changeUsername.setVisible(true);
+    }
+
+    public void sendChangeUsername(String newUsername) {
+        try {
+            networkService.sendCommand( changeUsernameCommand(nickname, newUsername));
+        } catch (IOException e) {
+            showErrorMessage(e.getMessage());
+        }
     }
 }
