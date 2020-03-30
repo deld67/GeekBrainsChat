@@ -42,4 +42,9 @@ public class BaseAuthService implements AuthService {
     public void stop() {
         System.out.println("Сервис аутентификации оставлен");
     }
+
+    @Override
+    public void updateUsername(String newUsername, String oldUsername) {
+
+    }
 }

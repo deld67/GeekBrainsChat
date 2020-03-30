@@ -108,4 +108,9 @@ public class NetworkServer {
         }
         return false;
     }
+    public void updateUserName(String newUsername, String oldUsername) throws IOException {
+        getAuthService().updateUsername(newUsername, oldUsername);
+        List<String> users = getAllUsernames();
+        broadcastMessage(Command.updateUsersListCommand(users), null);
+    }
 }

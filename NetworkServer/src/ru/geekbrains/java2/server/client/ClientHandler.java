@@ -4,12 +4,19 @@ import ru.geekbrains.java2.client.Command;
 import ru.geekbrains.java2.client.CommandType;
 import ru.geekbrains.java2.client.command.AuthCommand;
 import ru.geekbrains.java2.client.command.BroadcastMessageCommand;
+import ru.geekbrains.java2.client.command.ChangeUsernameCommand;
 import ru.geekbrains.java2.client.command.PrivateMessageCommand;
 import ru.geekbrains.java2.client.view.ChangeUsername;
 import ru.geekbrains.java2.server.NetworkServer;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
+
+//import java.io.*;
+//import java.net.Socket;
 
 public class ClientHandler {
 
@@ -96,7 +103,11 @@ public class ClientHandler {
                     break;
                 }
                 case CHANGE_USERNAME:{
-                    ChangeUsername changeUsername = (ChangeUsername) command.getData();
+                    ChangeUsernameCommand changeUsernameCommand = (ChangeUsernameCommand)  command.getData();
+                    String oldUsername = changeUsernameCommand.getOldUsername();
+                    String newUsername = changeUsernameCommand.getNewUsername();
+                    networkServer.updateUserName(newUsername, oldUsername);
+
                 }
                 default:
                     System.err.println("Unknown type of command : " + command.getType());

@@ -4,19 +4,19 @@ import java.io.Serializable;
 
 public class ChangeUsernameCommand implements Serializable {
 
-    private final String receiver;
-    private final String message;
+    private final String oldUsername;
+    private final String newUsername;
 
-    public ChangeUsernameCommand(String receiver, String message) {
-        this.receiver = receiver;
-        this.message = message;
+    public ChangeUsernameCommand(String oldUsername, String newUsername) {
+        this.oldUsername = oldUsername;
+        this.newUsername = newUsername;
     }
 
-    public String getReceiver() {
-        return receiver;
+    public String getOldUsername() {
+        return oldUsername;
     }
 
-    public String getMessage() {
-        return message;
+    public String getNewUsername() {
+        return newUsername;
     }
 }

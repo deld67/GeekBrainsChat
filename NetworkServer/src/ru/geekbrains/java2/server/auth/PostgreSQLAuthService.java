@@ -21,6 +21,15 @@ public class PostgreSQLAuthService implements AuthService  {
             this.username = username;
         }
     }
+    @Override
+    public void updateUsername(String newUsername, String oldUsername){
+        try {
+            Statement statement = conn.createStatement();
+            boolean resultSet = statement.execute("update gb_chat_users set username = '"+newUsername+"' where username = '"+oldUsername+"'");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public String getUsernameByLoginAndPassword(String login, String password) {
