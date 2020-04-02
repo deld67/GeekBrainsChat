@@ -73,6 +73,7 @@ public class ClientChat extends JFrame {
             @Override
             public void run() {
                 chatText.append(message);
+                controller.addMessageToLog( message + System.lineSeparator());
                 chatText.append(System.lineSeparator());
             }
         });
@@ -94,5 +95,10 @@ public class ClientChat extends JFrame {
             model.addAll(users);
             usersList.setModel(model);
         });
+    }
+
+    public void setChatText(String message) {
+        this.chatText.append(message);
+        this.chatText.append(System.lineSeparator());
     }
 }

@@ -1,6 +1,7 @@
 package ru.geekbrains.java2.client.controller;
 
 import ru.geekbrains.java2.client.Command;
+import ru.geekbrains.java2.client.model.FileLogService;
 import ru.geekbrains.java2.client.view.AuthDialog;
 import ru.geekbrains.java2.client.view.ChangeUsername;
 import ru.geekbrains.java2.client.view.ClientChat;
@@ -18,6 +19,7 @@ public class ClientController {
     private final AuthDialog authDialog;
     private final ClientChat clientChat;
     private final ChangeUsername changeUsername;
+    private final FileLogService fileLogService;
     private String nickname;
 
     public ClientController(String serverHost, int serverPort) {
@@ -25,6 +27,7 @@ public class ClientController {
         this.authDialog = new AuthDialog(this);
         this.clientChat = new ClientChat(this);
         this.changeUsername = new ChangeUsername(this);
+        this.fileLogService = new FileLogService();
     }
 
     public void runApplication() throws IOException {
@@ -40,10 +43,10 @@ public class ClientController {
                 clientChat.setTitle(nickname);
                 clientChat.setLogin_user_name(nickname);
                 ClientController.this.openChat();
+
             }
         });
         authDialog.setVisible(true);
-
     }
 
     private void openChat() {
@@ -51,9 +54,24 @@ public class ClientController {
         networkService.setMessageHandler(new MessageHandler() {
             @Override
             public void handle(String message) {
+
                 clientChat.appendMessage(message);
             }
         });
+
+        List<String> chatHistoryMess;
+
+        try {
+            chatHistoryMess = fileLogService.readMessagesFromLog();
+            int i = chatHistoryMess.size() > 100 ? chatHistoryMess.size() - fileLogService.getMaxLinesRead(): 0;
+            for ( i = 0; i < chatHistoryMess.size() ; i++) {
+                clientChat.setChatText(chatHistoryMess.get( i  ));
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         clientChat.setVisible(true);
     }
 
@@ -71,6 +89,7 @@ public class ClientController {
     }
 
     public void sendAuthMessage(String login, String pass) throws IOException {
+        fileLogService.InitLog( "history_"+login+".txt" );
         networkService.sendCommand(authCommand(login, pass));
     }
 
@@ -131,5 +150,9 @@ public class ClientController {
         } catch (IOException e) {
             showErrorMessage(e.getMessage());
         }
+    }
+
+    public void addMessageToLog(String message){
+        fileLogService.writeMessageToLog( message );
     }
 }
