@@ -125,6 +125,9 @@ public class ClientController {
     public void sendChangeUsername(String newUsername) {
         try {
             networkService.sendCommand( changeUsernameCommand(nickname, newUsername));
+            nickname = newUsername;
+            clientChat.setTitle(nickname);
+            clientChat.setLogin_user_name(nickname);
         } catch (IOException e) {
             showErrorMessage(e.getMessage());
         }

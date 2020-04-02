@@ -107,7 +107,7 @@ public class ClientHandler {
                     String oldUsername = changeUsernameCommand.getOldUsername();
                     String newUsername = changeUsernameCommand.getNewUsername();
                     networkServer.updateUserName(newUsername, oldUsername);
-
+                    break;
                 }
                 default:
                     System.err.println("Unknown type of command : " + command.getType());
@@ -179,4 +179,7 @@ public class ClientHandler {
         return nickname;
     }
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
