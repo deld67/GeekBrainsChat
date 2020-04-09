@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class NetworkServer {
@@ -53,7 +55,14 @@ public class NetworkServer {
 
     private void  createClientHandler(Socket clientSocket) {
         ClientHandler clientHandler = new ClientHandler(this, clientSocket);
-        clientHandler.run();
+        ExecutorService executorService = Executors.newFixedThreadPool( 1 );
+        executorService.execute( new Runnable() {
+            @Override
+            public void run() {
+                clientHandler.run();
+            }
+        } );
+
     }
 
     public AuthService getAuthService() {
