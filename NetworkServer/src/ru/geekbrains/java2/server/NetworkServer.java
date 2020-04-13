@@ -15,12 +15,13 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.*;
 import java.util.stream.Collectors;
 
 public class NetworkServer {
-
+    private static final Logger logger = Logger.getLogger( NetworkServer.class.getName() );
     private final int port;
-//    private final List<ClientHandler> clients = new ArrayList<>();
+    //    private final List<ClientHandler> clients = new ArrayList<>();
 //    private final List<ClientHandler> clients = Collections.synchronizedList(new ArrayList<>());
     private final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
     private final AuthService authService;
@@ -31,25 +32,40 @@ public class NetworkServer {
         this.port = port;
         //this.authService = new BaseAuthService();
         this.authService = new PostgreSQLAuthService();
+        try {
+            Handler h =new FileHandler("NeworkChatServer.log");
+            h.setLevel( Level.ALL );
+            h.setFormatter(new SimpleFormatter());
+            logger.addHandler(h);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Сервер был успешно запущен на порту " + port);
+            logger.log(Level.INFO, "Сервер был успешно запущен на порту " + port);
+
             authService.start();
             while (true) {
                 System.out.println("Ожидание клиентского подключения...");
+                logger.log(Level.INFO, "Ожидание клиентского подключения...");
                 Socket clientSocket = serverSocket.accept();
                 clientSocket.setSoTimeout(CONNECTION_TIMEOUT);
                 System.out.println("Клиент подлючился");
+                logger.log(Level.INFO,"Клиент подлючился");
                 createClientHandler(clientSocket);
 
             }
         }catch (IOException e) {
             System.out.println("Ошибка при работе сервера");
+            logger.log(Level.SEVERE,"Ошибка при работе сервера",e);
             e.printStackTrace();
         } finally {
             authService.stop();
+            logger.log(Level.INFO,"Сервер был успешно  остановлен");
         }
     }
 
@@ -75,18 +91,23 @@ public class NetworkServer {
                 client.sendMessage(message);
             }
         }
+        if (owner != null)
+            logger.log(Level.INFO,"Пользователь "+owner.getNickname()+" отправил сообщние всем пользователям");
     }
 
     public /*synchronized*/ void subscribe(ClientHandler clientHandler) throws IOException {
         clients.add(clientHandler);
         List<String> users = getAllUsernames();
         broadcastMessage(Command.updateUsersListCommand(users), null);
+
+        logger.log(Level.INFO,"Пользователь "+clientHandler.getNickname()+" вошел в чат");
     }
 
     public /*synchronized*/ void unsubscribe(ClientHandler clientHandler) throws IOException {
         clients.remove(clientHandler);
         List<String> users = getAllUsernames();
         broadcastMessage(Command.updateUsersListCommand(users), null);
+        logger.log(Level.INFO,"Пользователь "+clientHandler.getNickname()+" вышел из чата");
     }
 
     private List<String> getAllUsernames() {
@@ -104,9 +125,11 @@ public class NetworkServer {
         for (ClientHandler client : clients) {
             if (client.getNickname().equals(receiver)) {
                 client.sendMessage(commandMessage);
+                logger.log(Level.INFO,"Пользователю "+client.getNickname()+" направлено персональное сообщение");
                 break;
             }
         }
+
     }
 
     public boolean isNicknameBusy(String username) {
